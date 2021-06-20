@@ -11,9 +11,10 @@ class MyArray {
     }
 
     unshift() {
-        for (let i = arguments.length + this.length - 1; i >= 0; i--) {
-            this[i] = this[i - arguments.length]
+        for (let i = arguments.length + this.length - 1; i >= arguments.length; i--) {
+            this[i] = this[i - arguments.length];
         }
+
         for (let i = 0; i < arguments.length; i++) {
             this[i] = arguments[i];
             this.length++;
@@ -32,7 +33,7 @@ class MyArray {
     }
 }
 
-const array1 = new MyArray(3, 6, 5, 6, 7, 10, 14);
+const array1 = new MyArray();
 
 array1.push(9, 7, 3);
 array1.unshift(34, 56);
@@ -49,12 +50,15 @@ class RangeValidator {
         if(!Number.isSafeInteger(number1) || !Number.isSafeInteger(number2)) {
             throw new RangeError(`Value of the arguments must be bigger than ${Number.MIN_SAFE_INTEGER} and less than ${Number.MAX_SAFE_INTEGER}`);
         }
-
-        this.from = number1;
+        
         this.to = number2;
+        this.from = number1;
     }
 
     set from(value) {
+        if (value > this.to) {
+            throw new RangeError("First value of the range must be less than second value");
+        }
         this._from = value;
     }
 
@@ -82,14 +86,14 @@ class RangeValidator {
             throw new RangeError(`Value must be bigger than ${Number.MIN_SAFE_INTEGER} and less than ${Number.MAX_SAFE_INTEGER}`);
         }
 
-        return this.from < value < this.to; 
+        return this.from <= value && value <= this.to; 
     }    
 }    
 
 try {
-    const range = new RangeValidator(-3, 6)
+    const range = new RangeValidator(1, 5);
     console.log(range.getterRange());
-    console.log(range.validate(3));
+    console.log(range.validate(5));
 } catch(error) {
     console.error(error);
 }
