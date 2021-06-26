@@ -44,21 +44,25 @@ console.table(array1);
 // RangeValidator
 class RangeValidator {
     constructor(number1, number2) {
-        if (typeof number1 !== "number" || typeof number2 !== "number") {
-            throw new TypeError("Value type of the arguments must be a Number");
-        }
-        if(!Number.isSafeInteger(number1) || !Number.isSafeInteger(number2)) {
-            throw new RangeError(`Value of the arguments must be bigger than ${Number.MIN_SAFE_INTEGER} and less than ${Number.MAX_SAFE_INTEGER}`);
-        }
-        
         this.to = number2;
         this.from = number1;
     }
 
-    set from(value) {
-        if (value > this.to) {
-            throw new RangeError("First value of the range must be less than second value");
+    checkRangeValue(rangeLimit) {
+        if(typeof rangeLimit !== 'number') {
+            throw new TypeError("Value must be a number")
         }
+        if(!Number.isSafeInteger(rangeLimit)) {
+            throw new RangeError(`Value must be bigger than ${Number.MIN_SAFE_INTEGER} and less than ${Number.MAX_SAFE_INTEGER}`);
+        }
+    }
+
+    set from(value) {
+        if (value > this._to) {
+            throw new RangeError("First value of the range must be less than the second value");
+        }
+        this.checkRangeValue(value);
+
         this._from = value;
     }
 
@@ -67,6 +71,11 @@ class RangeValidator {
     }
 
     set to(value) {
+        if (value < this._from) {
+            throw new RangeError("Second value of the range must be bigger than the first value");
+        }
+        this.checkRangeValue(value);
+
         this._to = value;
     }
 
@@ -79,13 +88,8 @@ class RangeValidator {
     }
 
     validate(value) {
-        if(typeof value !== "number") {
-            throw new TypeError("Value must be a number");
-        }
-        if(!Number.isSafeInteger(value)) {
-            throw new RangeError(`Value must be bigger than ${Number.MIN_SAFE_INTEGER} and less than ${Number.MAX_SAFE_INTEGER}`);
-        }
-
+        this.checkRangeValue(value);
+        
         return this.from <= value && value <= this.to; 
     }    
 }    
@@ -93,7 +97,7 @@ class RangeValidator {
 try {
     const range = new RangeValidator(1, 5);
     console.log(range.getterRange());
-    console.log(range.validate(5));
+    console.log(range.validate(2));
 } catch(error) {
     console.error(error);
 }
